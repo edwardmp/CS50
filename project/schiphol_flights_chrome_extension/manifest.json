@@ -1,0 +1,51 @@
+{
+  "name": "Schiphol Flights",
+  "short_name": "Schiphol",
+  "version": "1.0.0",
+  "manifest_version": 2,
+  "default_locale": "en",
+  "description": "This extension let's you lookup your flight's status if departing or arriving at Amsterdam Airport Schiphol (AMS).",
+  "homepage_url": "http://www.schipholapp.nl",
+  "icons": {
+    "16": "icons/Schiphol_icon_16.png",
+    "48": "icons/Schiphol_icon_48.png",
+    "128": "icons/Schiphol_icon_128.png"
+  },
+  "default_locale": "en",
+  "permissions": [
+    "http://api.schipholapp.nl/*/",
+    "notifications",
+    "background",
+    "alarms",
+    "storage"
+  ],
+  "background": {
+    "page": "src/bg/background.html"
+  },
+  "browser_action": {
+     "default_icon": {
+      "19": "icons/Schiphol_icon_19.png",
+      "38": "icons/Schiphol_icon_38.png"
+    },
+    "default_title": "Schiphol Flights",
+    "default_popup": "src/browser_action/browser_action.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.google.com/*"
+      ],
+      "css": [
+        "src/inject/inject.css"
+      ]
+    },
+    {
+      "matches": [
+        "https://www.google.com/*"
+      ],
+      "js": [
+        "src/inject/inject.js"
+      ]
+    }
+  ]
+}

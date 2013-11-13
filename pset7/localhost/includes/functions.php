@@ -1,0 +1,242 @@
+<?php
+
+     /***********************************************************************
+     * functions.php
+     *
+     * Edward M. Poot
+     * edwardmp@gmail.com
+     *
+     * Problem Set 7
+     *
+     * Helper functions.
+     **********************************************************************/
+
+    require_once("constants.php");
+
+    /**
+     * Apologizes to user with message. 
+     * Additional ption to output without header and footer.
+     */
+    function apologize($message, $without_header_footer = false)
+    {
+        render("apology.php", ["message" => $message], $without_header_footer);
+        exit;
+    }
+
+    /**
+     * Facilitates debugging by dumping contents of variable
+     * to browser.
+     */
+    function dump($variable)
+    {
+        require("../templates/dump.php");
+        exit;
+    }
+
+    /**
+     * Logs out current user, if any.  Based on Example #1 at
+     * http://us.php.net/manual/en/function.session-destroy.php.
+     */
+    function logout()
+    {
+        // unset any session variables
+        $_SESSION = array();
+
+        // expire cookie
+        if (!empty($_COOKIE[session_name()]))
+        {
+            setcookie(session_name(), "", time() - 42000);
+        }
+
+        // destroy session
+        session_destroy();
+    }
+
+    /**
+     * Returns a stock by symbol (case-insensitively) else false if not found.
+     */
+    function lookup($symbol)
+    {
+        if (!preg_match('/^[a-zA-Z0-9\.^]+$/', $symbol))
+            return false;
+            
+        // reject symbols that contain commas
+        if (preg_match("/,/", $symbol))
+            return false;
+
+        // open connection to Yahoo
+        $handle = @fopen("http://download.finance.yahoo.com/d/quotes.csv?f=snl1xp2&s=$symbol", "r");
+        if ($handle === false)
+        {
+            // trigger (big, orange) error
+            trigger_error("Could not connect to Yahoo!", E_USER_ERROR);
+            exit;
+        }
+
+        // download first line of CSV file
+        $data = fgetcsv($handle);
+        if ($data === false || count($data) == 1)
+        {
+            return false;
+        }
+
+        // close connection to Yahoo
+        fclose($handle);
+
+        // ensure symbol was found
+        if ($data[2] === "0.00")
+        {
+            return false;
+        }
+
+        // return stock as an associative array
+        return [
+            "symbol" => $data[0],
+            "name" => $data[1],
+            "price" => $data[2],
+            "stock_exchange" => $data[3],
+            "change_percent" => $data[4]
+        ];
+    }
+
+    /**
+     * Executes SQL statement, possibly with parameters, returning
+     * an array of all rows in result set or false on (non-fatal) error.
+     */
+    function query(/* $sql [, ... ] */)
+    {
+        // SQL statement
+        $sql = func_get_arg(0);
+
+        // parameters, if any
+        $parameters = array_slice(func_get_args(), 1);
+
+        // try to connect to database
+        static $handle;
+        if (!isset($handle))
+        {
+            try
+            {
+                // connect to database
+                $handle = new PDO("mysql:dbname=" . DATABASE . ";host=" . SERVER, USERNAME, PASSWORD);
+
+                // ensure that PDO::prepare returns false when passed invalid SQL
+                $handle->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            }
+            catch (Exception $e)
+            {
+                // trigger (big, orange) error
+                trigger_error($e->getMessage(), E_USER_ERROR);
+                exit;
+            }
+        }
+
+        // prepare SQL statement
+        $statement = $handle->prepare($sql);
+        if ($statement === false)
+        {
+            // trigger (big, orange) error
+            trigger_error($handle->errorInfo()[2], E_USER_ERROR);
+            exit;
+        }
+        
+        // execute SQL statement
+        $results = $statement->execute($parameters);
+        // return result set's rows, if any
+        if ($results !== false)
+        {   
+            return $statement->fetchAll(PDO::FETCH_ASSOC);
+        }
+        else if ($statement->errorCode() != 0)
+            return $statement->errorCode(); // error occurred
+        else  
+            return false;
+    }
+
+    /**
+     * Redirects user to destination, which can be
+     * a URL or a relative path on the local host.
+     *
+     * Because this function outputs an HTTP header, it
+     * must be called before caller outputs any HTML.
+     */
+    function redirect($destination)
+    {
+        // handle URL
+        if (preg_match("/^https?:\/\//", $destination))
+        {
+            header("Location: " . $destination);
+        }
+
+        // handle absolute path
+        else if (preg_match("/^\//", $destination))
+        {
+            $protocol = (isset($_SERVER["HTTPS"])) ? "https" : "http";
+            $host = $_SERVER["HTTP_HOST"];
+            header("Location: $protocol://$host$destination");
+        }
+
+        // handle relative path
+        else
+        {
+            // adapted from http://www.php.net/header
+            $protocol = (isset($_SERVER["HTTPS"])) ? "https" : "http";
+            $host = $_SERVER["HTTP_HOST"];
+            $path = rtrim(dirname($_SERVER["PHP_SELF"]), "/\\");
+            header("Location: $protocol://$host$path/$destination");
+        }
+
+        // exit immediately since we're redirecting anyway
+        exit;
+    }
+
+    /**
+     * Renders template, passing in values.
+     */
+    function render($template, $values = [], $without_header_footer = false)
+    {
+        // if template exists, render it
+        if (file_exists("../templates/$template"))
+        {
+            // extract variables into local scope
+            extract($values);
+            
+            // get cash balance, so we can display it in header
+            if (isset($_SESSION["id"]))
+            {
+                $balance_query = query("SELECT cash FROM users WHERE id = ?", $_SESSION["id"]);
+                $cash_balance = number_format($balance_query[0]["cash"], 2);
+            }
+            // don't render header if not requested (used by AJAX calls)
+            if (!$without_header_footer)
+                require("../templates/header.php");
+
+            // render template
+            require("../templates/$template");
+
+            // render footer
+            if(!$without_header_footer)
+                require("../templates/footer.php");
+        }
+
+        // else error
+        else
+        {
+            trigger_error("Invalid template: $template", E_USER_ERROR);
+        }
+    }
+
+    /**
+     * Checks if menu element needs to be active or not.
+     */
+    function activeMenuElement($page)
+    {
+    
+        if (stripos($_SERVER["PHP_SELF"], $page))
+            $active = ' class = "active"';
+        else 
+            $active = NULL;
+               
+        return $active;
+    }
+?>

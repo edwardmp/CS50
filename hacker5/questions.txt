@@ -1,0 +1,42 @@
+0.  It's the longest word (45 characters) to ever appear in an English language dictionary.
+The word is assumed to refer to a specific medical condition of a lung.
+It is alleged that the word is made up and does not actually appear in any medical literature.
+
+1.  It gets information about the computer's resource utilization. 
+Using rusage a benchmark can be generated and compared against different implementations of other people.
+
+2.  The man page lists 16 different variables.
+
+3.  This is done so we can use the same struct variables (before and after) over and over again in different parts of the code.
+In every new use of the two variables, the contents are overwritten. If we weren't passing by address, for every new benchmark in the code new struct variables have to be initialized, which would be slower since it is a large struct.
+
+4.  The for loop iterates over each character, and stop when the End Of File (EOF) sign is reached.
+If a character is alphabetic, or contains an apostrophe (but not in the first character, hence index > 0 in condition) it is assigned to the correct index position of the word. 
+The index position is incremented after a char is added, so the next char is put in the position in the word array.
+If the index is higher than the maximum length of a word, we read through the rest of the word but do not add it to the word array.
+The word index is reset to 0 in that case.
+Words containing digits are ignored. We read through them and reset the word index.
+If the index at a given point is more than 0, but the character is not alphabetic or an apostrophe (this is excluded by the first if statement), it is probably a newline character.
+This means we're at the end of the previous word line, so we've found the beginning of a new word.
+The amount of words looped through counter is incremented by 1, the word is checked in the dictionary to see if it is mispelled.
+Next, the index position is reset to 0 so the next word can be looped through.
+
+5.  It is easier to use fgetc() in this case because you retrieve a single character, which you can check for digits, alphabetic chars, etc.
+If you use fscanf(), you get a whole char string and you manually have to loop through each index of the char string, and you would need to produce more code.
+
+6.  This is done so that the input parameters can't be altered from within the function.
+
+7.  Hash table. Each word is hashed and stored in the hash array. 
+Every entry in hash array contains a linked list. 
+Each node in the linked list consists of a char* (the word that is stored) and a pointer to the next node.
+
+8.  The first my code was already pretty fast. 
+Notably my code even got a bit slower after further development, since initially I forgot to free memory, which also takes time.
+
+9.  I added some extra functionality to print out the amount of unique mispelled words.
+This is a tradeoff because I need a second hash table in order to calculate the amount of mispelled words.
+So, the final runtime will be a little bit slower, but I do get this extra functionality on the other hand.
+
+10. In a large input file the bottleneck is going to be in the check() function. 
+This is because we need to traverese a linked list, and if this list is large it will be quite slow.
+This can be solved by having the most ideal hash function, so that each key in the hashtable has only 1 node.

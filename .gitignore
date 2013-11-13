@@ -1,0 +1,5 @@
+# ignore quiz dirs
+/quiz*
+
+# ignore tarballs
+*.tar.gz

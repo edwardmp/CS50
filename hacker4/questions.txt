@@ -1,0 +1,46 @@
+0. BMP: different pixel formats, maximum format is 32 bit per pixel, which is 2^32 or 4294967296 colors
+GIF: maximum of 8 bits per pixel, which is 2^8 or 256 colors
+JPEG: depends on color profile, in case of sRGB it is 24 bits per pixel, which is 2^24 or 16777216 colors
+PNG: maximum of 64 bits per pixel (in case of alpa channel) which is 2^64 possible colors
+
+1. Only GIF supports this out of the box. PNG allows for this using a non-standard extension (APNG)
+
+2. In case of a lossy compression, some data in the original file is removed in order to make the compressed file as small as possible.
+This means the quality of image that is compressed with lossy techniques won't be as good as that of the original.
+When lossless compression is used, only techniques that don't alter the image quality are used to compress the image. The compression is reservable.
+The compressed image's quality is equal to that of the original image. Therefore, we name the compression to be "lossless" as opposed to lossy.
+    
+3. JPEG is lossy. GIF, PNG and BMP are lossless, but GIF only supports 256 colors so the images are usually quite small.
+    
+4. The file's metadata in the FAT (FILE ALLOCATION TABLE) is deleted.
+This metadata contains references to where on the disk the data is really stored.
+So only the place it it stored is deleted, not the actual file.
+	
+5. There are a few options. Physically destroying the drive is one, but this is not really the best option. Another option is to overwrite all previous data with random data (zero's and ones). Last, a strong magnet can be used but in most cases this would render the drive unusable, just like physically destroying is. So overwriting the data (also called "Securely delete" in OS' like Mac OS X.
+
+6. stdint.h is a library used to overcome differences between integer sizes across different implementations.
+
+7. usual integer types vary in size according to different systems implementations.
+stdint.h and these filetypes define exactly (e.g.) the width of the integer. No matter how any system implements normal integer types, these types are assured to be of a specific size. So, this way a developer does not need to provide additional code to overcome different system implementations.
+
+8. BYTE is 1 byte, DWORD is 4 bytes, LONG is 4 bytes and WORD is 2 bytes
+
+9. The bfType, which must always be equal to BF, or in hex Ox4d42 (= 19778 in decimal)
+
+10. bfSize is the size of the actual file, while biSize is the size needed to represent the structure (image). The difference between the to is are the headers (which is 54 bytes).
+
+11. Then the bitmap is structured starting from the top at the right corner, all the way down.
+
+12. According to MSDN this is the biBitCount field.
+
+13. This happens for example if the program does not have the right permissions/rights to write a file in the directory, thus the fopen() function returns NULL to indicate an error.
+
+14. Because you only want to return one struct of a given size, specified in the second argument.
+
+15. 3
+
+16. fseek sets the current file position indicator. In this case fseek sets the file position to be of size the padding plus the reference value. The reference value, which is the third argument is set to SEEK_CUR which is the current file position indicator.
+
+17. See answer 16.
+
+18. Some bear character. I don't recognize him, but the image is clear.

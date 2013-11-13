@@ -1,0 +1,10 @@
+{
+  "l10nTabName": {
+    "message":"Localization"
+    ,"description":"name of the localization tab"
+  }
+  ,"l10nHeader": {
+    "message":"It does localization too! (this whole tab is, actually)"
+    ,"description":"Header text for the localization section"
+  }
+}

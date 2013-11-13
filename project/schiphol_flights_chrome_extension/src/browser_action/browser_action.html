@@ -1,0 +1,59 @@
+<!----
+/****************************************************************************
+ * browser_action.html
+ *
+ * Edward M. Poot
+ * edwardmp@gmail.com
+ *
+ * Contains complete GUI of Chrome extension.
+ ***************************************************************************/
+----->
+
+<!DOCTYPE html>
+<head>
+	<link rel="stylesheet" type="text/css" href="../inject/inject.css">
+	<script src="../../js/jquery/jquery.min.js"></script>
+	<script src="../../js/jquery/jquery.autocomplete.min.js"></script>
+	<script src="../inject/inject.js"></script>
+	<title>Schiphol</title>
+</head>
+
+<body>
+	<div id="mainPopup">
+		<h1>Schiphol Flights</h1>
+
+		<div style="width: 100%">
+			<input class="input-text" type="text" id="flight" placeholder="Enter Flight number, city or time hh:mm" style="width: 65%" />
+			<input class="button" type="button" id="button" value="Search flight" style="width: 30%; float: right;"/>
+		</div>
+
+		<p id="error"></p>
+
+		<table id="results">
+			<thead>
+				<tr>
+					<td>Flight</td>
+					<td>Type</td>
+					<td>Scheduled</td>
+					<td>Origin</td>
+					<td>Actual</td>
+					<td></td>
+				</tr>
+			</thead>
+			<tbody id="results_body">
+			</tbody>
+		</table>
+
+		<h3 id="alerts_header">Followed flights</h3>
+		<p id="alerts"></p>
+
+		<h3 id="detail_header"></h3>
+		<table id="detail">
+			<thead>
+			</thead>
+			<tbody id="detail_body">
+			</tbody>
+		</table>
+
+	</div>
+</body>
