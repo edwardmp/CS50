@@ -7,7 +7,6 @@
 # Hacker 6
 #
 
-
 # compiler to use
 CC = clang
 
